@@ -4,3 +4,4 @@ sentence-transformers
 python-dotenv
 numpy
 pytest
+pytest-cov
