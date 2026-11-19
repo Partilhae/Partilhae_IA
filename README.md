@@ -75,7 +75,7 @@ flowchart TD
 
 ## Base de conhecimento
 
-A base contém cinco documentos e 28 chunks utilizados na recuperação.
+A base contém cinco documentos e 31 chunks utilizados na recuperação.
 
 | Documento | Conteúdo |
 |---|---|
@@ -174,12 +174,12 @@ Os testes do RAG verificam carregamento, divisão de documentos, ordenação, re
 
 | Indicador | Resultado |
 |---|---:|
-| Testes do RAG | 21/21 |
+| Testes do RAG | 28/28 |
 | Testes do chatbot | 11/11 |
-| Total de testes aprovados | 32/32 |
+| Total de testes aprovados | 39/39 |
 | Cobertura de instruções em `src` | 97/97 (100%) |
 | Cobertura de ramificações em `src` | 42/42 (100%) |
-| Tempo da execução final | 12,35 s |
+| Tempo da execução final | 13,51 s |
 
 ```text
 Name              Stmts   Miss Branch BrPart  Cover
@@ -189,7 +189,8 @@ src/chatbot.py       36      0     14      0   100%
 src/rag.py           61      0     28      0   100%
 ---------------------------------------------------
 TOTAL                97      0     42      0   100%
-32 passed, 2 warnings in 12.35s
+
+39 passed, 2 warnings in 13.51s
 ```
 
 Os dois avisos são RuntimeWarnings do `runpy`, relacionados à execução de módulos previamente importados nos testes de terminal. A cobertura se refere à pasta `src`, excluindo a interface Streamlit, e não mede a precisão do modelo generativo.
@@ -210,6 +211,43 @@ A recuperação inicial retornava sempre os três trechos mais próximos, inclus
 | Como instalar o Windows? | 0,0443 |
 
 O limiar foi reduzido para 0,35. Em uma nova rodada de seis perguntas, as três válidas receberam respostas adequadas e as três irrelevantes foram recusadas sem fontes. Esse resultado fundamenta a configuração atual, mas não garante a generalização para todas as perguntas.
+
+### Aprimoramento da base de conhecimento
+
+Durante a validação manual, foram identificadas perguntas relacionadas ao Partilhaê que apresentavam similaridade inferior ao limiar de 0,35, apesar de pertencerem ao escopo do assistente.
+
+Para solucionar esse problema, o documento `partilhae.md` foi ampliado com títulos mais descritivos e orientações detalhadas sobre as funcionalidades da plataforma. A base passou de 28 para 31 chunks.
+
+| Pergunta | Antes | Depois |
+|---|---:|---:|
+| O que é o Partilhaê? | 0,2985 | 0,5150 |
+| Como funciona o Partilhaê? | 0,3211 | 0,4780 |
+| Como faço para doar alimentos? | 0,7230 | 0,8310 |
+| Como posso solicitar ajuda? | 0,3850 | 0,6727 |
+
+A melhoria foi realizada sem alterar o algoritmo de recuperação ou o limiar de similaridade.
+
+As quatro perguntas foram validadas utilizando a API real do Gemini e incorporadas aos testes automatizados de regressão. As perguntas fora do escopo avaliadas continuaram sendo recusadas.
+
+Após a atualização, os 36 testes automatizados foram aprovados, mantendo 100% de cobertura de instruções e ramificações no pacote `src`.
+
+### Expansão final da base de conhecimento
+
+A documentação do aplicativo mobile foi utilizada para complementar as informações sobre os tipos de ajuda, cancelamento de solicitações, funcionalidades dos usuários e objetivos sociais da plataforma.
+
+Também foram adicionadas orientações voltadas a perguntas em linguagem informal, ampliando a acessibilidade do assistente.
+
+A base passou de 31 para 38 chunks.
+
+| Pergunta | Similaridade máxima |
+|---|---:|
+| Qual a diferença entre ajuda específica e qualquer ajuda? | 0,4815 |
+| Posso cancelar uma solicitação? | 0,6314 |
+| Pedido de ajuda em linguagem informal | 0,7460 |
+
+Os três novos cenários foram validados com o Gemini real e incorporados aos testes de regressão.
+
+O resultado final foi de 39 testes aprovados, com 100% de cobertura de instruções e ramificações no pacote `src`, mantendo o limiar de similaridade de 0,35.
 
 ### Avaliação final com perguntas novas
 
@@ -241,3 +279,14 @@ Resultados: 10/10 cenários satisfatórios, 7/7 consultas temáticas com a fonte
 - A tentativa de prompt injection avaliada foi bloqueada por ausência de contexto relevante; isso não comprova resistência a ataques com contexto temático.
 - O histórico do Streamlit é apenas visual: as perguntas são processadas independentemente.
 - A integração com o Partilhaê é temática e baseada na documentação do projeto; não existe integração técnica direta com o mobile, APIs ou banco de dados.
+
+## Declaração de uso de IA generativa
+
+Durante o desenvolvimento do projeto, foram utilizadas as seguintes ferramentas de inteligência artificial:
+
+| Ferramenta | Finalidade |
+|---|---|
+| ChatGPT (OpenAI) | Apoio na implementação, revisão de código, diagnóstico de erros, elaboração de testes automatizados e organização da documentação. |
+| Gemini (Google) | Modelo generativo utilizado pelo assistente inteligente para elaborar respostas com base no contexto recuperado pelo RAG. |
+
+Os códigos, conteúdos e sugestões foram revisados e validados por meio de testes automatizados e manuais, buscando garantir a compreensão das soluções utilizadas e sua adequação aos requisitos do projeto.

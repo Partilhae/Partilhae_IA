@@ -110,12 +110,15 @@ if __name__ == "__main__":
     print("Chunks gerados:", len(rag.chunks))
 
     perguntas = [
+        "O que é o Partilhaê?",
+        "Como funciona o Partilhaê?",
+        "Como faço para doar alimentos?",
+        "Como posso solicitar ajuda?",
         "Quem ganhou a Copa do Mundo de 2022?",
         "Como instalar o Windows?",
-        "Quais alimentos podem ser doados?",
-        "Como devo armazenar alimentos perecíveis?",
-        "Como faço uma solicitação pelo Partilhaê?",
-        "Como faço para solicitar uma doação pelo Partilhaê?"
+        "Qual a diferença entre ajuda específica e qualquer ajuda?",
+        "Posso cancelar uma solicitação?",
+        "oi, to precisando de comida pra minha familia, como q eu faço pra pedir ajuda?",
     ]
 
     for pergunta in perguntas:

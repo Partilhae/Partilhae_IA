@@ -18,7 +18,7 @@ def test_dividir_documentos():
     documentos = carregar_documentos()
     chunks = dividir_documentos(documentos)
 
-    assert len(chunks) == 28
+    assert len(chunks) == 38
 
 
 def test_estrutura_dos_chunks():
@@ -58,6 +58,51 @@ def test_recuperar_contexto_relevante(
 
     assert resultados
     assert resultados[0]["fonte"] == fonte_esperada
+
+
+@pytest.mark.parametrize("pergunta, trecho_esperado", [
+    (
+        "O que é o Partilhaê?",
+        "O que é o Partilhaê?"
+    ),
+    (
+        "Como funciona o Partilhaê?",
+        "Como funciona o Partilhaê?"
+    ),
+    (
+        "Como faço para doar alimentos?",
+        "Como faço para doar alimentos pelo Partilhaê?"
+    ),
+    (
+        "Como posso solicitar ajuda?",
+        "Como posso solicitar ajuda pelo Partilhaê?"
+    ),
+    (
+        "Qual a diferença entre ajuda específica e qualquer ajuda?",
+        "Qual a diferença entre ajuda específica e qualquer ajuda?"
+    ),
+    (
+        "Posso cancelar uma solicitação?",
+        "Posso editar, cancelar ou excluir uma solicitação?"
+    ),
+    (
+        "oi, to precisando de comida pra minha familia, como q eu faço pra pedir ajuda?",
+        "Preciso de comida para minha família. Como posso pedir ajuda?"
+    )
+])
+def test_recuperar_informacoes_partilhae(
+    rag, pergunta, trecho_esperado
+):
+    resultados = rag.buscar(pergunta)
+
+    assert resultados
+
+    assert any(
+        resultado["fonte"] == "partilhae.md"
+        and trecho_esperado in resultado["texto"]
+        and resultado["similaridade"] >= 0.35
+        for resultado in resultados
+    )
 
 
 @pytest.mark.parametrize("pergunta", [
@@ -104,6 +149,7 @@ def test_ordem_dos_resultados(rag):
 
     assert similaridades == sorted(similaridades, reverse=True)
 
+
 def test_base_de_conhecimento_vazia():
     from unittest.mock import patch
 
@@ -147,6 +193,7 @@ def test_ignorar_referencias_bibliograficas():
 def test_pergunta_apenas_espacos(rag):
     with pytest.raises(ValueError):
         rag.buscar("   ")
+
 
 def test_execucao_terminal():
     import runpy
