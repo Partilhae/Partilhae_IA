@@ -67,7 +67,7 @@ class RAG:
             normalize_embeddings=True
         )
 
-    def buscar(self, pergunta, top_k=3):
+    def buscar(self, pergunta, top_k=3, min_similarity=0.35):
         if not pergunta.strip():
             raise ValueError("A pergunta não pode estar vazia.")
 
@@ -89,10 +89,15 @@ class RAG:
         resultados = []
 
         for indice in indices:
+            similaridade = float(similaridades[indice])
+
+            if similaridade < min_similarity:
+                continue
+
             resultados.append({
                 "fonte": self.chunks[indice]["fonte"],
                 "texto": self.chunks[indice]["texto"],
-                "similaridade": float(similaridades[indice])
+                "similaridade": similaridade
             })
 
         return resultados
@@ -104,13 +109,25 @@ if __name__ == "__main__":
     print("Documentos carregados:", len(rag.documentos))
     print("Chunks gerados:", len(rag.chunks))
 
-    pergunta = "Quais alimentos podem ser doados?"
+    perguntas = [
+        "Quem ganhou a Copa do Mundo de 2022?",
+        "Como instalar o Windows?",
+        "Quais alimentos podem ser doados?",
+        "Como devo armazenar alimentos perecíveis?",
+        "Como faço uma solicitação pelo Partilhaê?",
+        "Como faço para solicitar uma doação pelo Partilhaê?"
+    ]
 
-    print("\nPergunta:", pergunta)
+    for pergunta in perguntas:
+        print("\nPergunta:", pergunta)
 
-    resultados = rag.buscar(pergunta)
+        resultados = rag.buscar(pergunta, top_k=3)
 
-    for resultado in resultados:
-        print("\nFonte:", resultado["fonte"])
-        print(f"Similaridade: {resultado['similaridade']:.4f}")
-        print("Texto:", resultado["texto"])
+        if not resultados:
+            print("Nenhum contexto relevante encontrado.")
+            continue
+
+        for resultado in resultados:
+            print("\nFonte:", resultado["fonte"])
+            print(f"Similaridade: {resultado['similaridade']:.4f}")
+            print("Texto:", resultado["texto"])

@@ -25,6 +25,18 @@ class Chatbot:
 
         resultados = self.rag.buscar(pergunta, top_k=3)
 
+        if not resultados:
+            return {
+                "resposta": (
+                    "Não encontrei informações relevantes na minha "
+                    "base de conhecimento para responder a essa pergunta. "
+                    "Posso ajudar com dúvidas sobre doações, conservação "
+                    "de alimentos e funcionamento do Partilhaê."
+                ),
+                "fontes": [],
+                "contexto": []
+            }
+
         contexto = "\n\n".join(
             f"Fonte: {resultado['fonte']}\n"
             f"{resultado['texto']}"
@@ -95,7 +107,8 @@ if __name__ == "__main__":
         print("\nAssistente Partilhaê:")
         print(resultado["resposta"])
 
-        print("\nFontes recuperadas:")
+        if resultado["fontes"]:
+            print("\nFontes recuperadas:")
 
-        for fonte in resultado["fontes"]:
-            print("-", fonte)
+            for fonte in resultado["fontes"]:
+                print("-", fonte)
